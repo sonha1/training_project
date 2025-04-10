@@ -31,25 +31,17 @@ public class OtpDomain {
 
     public OtpLimitEntity validateLimitOtpByPhoneNumber(String phoneNumber) {
         log.info("[validateLimitOtpByPhoneNumber] START with phone {}", phoneNumber);
-
-        // check otp limit
         Optional<OtpLimitEntity> otpLimitOpt = otpLimitRedisRepository.findById(phoneNumber);
-
         if (otpLimitOpt.isEmpty()) {
             OtpLimitEntity entity = new OtpLimitEntity();
             entity.setPhoneNumber(phoneNumber);
             entity.setDailyOtpCounter(0);
-
             long timeToLive = TimeUtils.getTimeToLiveEndOfDay();
             entity.setTtl(timeToLive);
-
             return entity;
         }
 
         OtpLimitEntity otpLimit = otpLimitOpt.get();
-
-        // check otp limit
-
         if (otpLimit.getDailyOtpCounter() >= 5) {
             log.info("[validateLimitOtpByPhoneNumber] request fail : otp limit reached with phone {}", phoneNumber);
             throw new ApplicationException(ERROR_CODE.INVALID_REQUEST, "OTP limit reached");
@@ -62,13 +54,8 @@ public class OtpDomain {
 
     public RegisterUserEntity genOtpWhenUserRegister(String phoneNumber, String password) {
         log.info("[genOtpWhenUserRegister] START with phone {}", phoneNumber);
-
-        // validate otp limit daily
         OtpLimitEntity otpLimit = this.validateLimitOtpByPhoneNumber(phoneNumber);
-
         String otp = genOtp();
-
-        // save otp to redis
         RegisterUserEntity registerUserEntity = new RegisterUserEntity();
 
         String transactionId = UUID.randomUUID().toString();
@@ -80,9 +67,7 @@ public class OtpDomain {
         registerUserEntity.setOtpFail(0);
         registerUserEntity.setOtpExpiredTime(System.currentTimeMillis() / 1000 + 300);
         registerUserEntity.setOtpResendTime(System.currentTimeMillis() / 1000 + 60);
-
         registerUserEntity.setTtl(900);
-
         registerUserRedisRepository.save(registerUserEntity);
 
         otpLimit.setDailyOtpCounter(otpLimit.getDailyOtpCounter() + 1);
@@ -94,23 +79,16 @@ public class OtpDomain {
 
     public void genOtpWhenUserResend(RegisterUserEntity userEntity) {
         log.info("[genOtpWhenUserResend] START with phone {}", userEntity.getPhoneNumber());
-
-        // validate otp limit daily
         OtpLimitEntity otpLimit = this.validateLimitOtpByPhoneNumber(userEntity.getPhoneNumber());
-
-        // validate time allow to send OTP
         if (System.currentTimeMillis() / 1000 - userEntity.getOtpResendTime() < 0) {
             throw new ApplicationException(ERROR_CODE.INVALID_REQUEST, "OTP resend time not allow to send OTP!");
         }
-
-        // generate OTP
         if (userEntity.getOtpExpiredTime() < System.currentTimeMillis() / 1000) {
             String otp = genOtp();
-
-            // update otp to redis
             userEntity.setOtp(otp);
             userEntity.setOtpExpiredTime(System.currentTimeMillis() / 1000 + 300);
         }
+
         userEntity.setTtl(900);
         userEntity.setOtpResendTime(System.currentTimeMillis() / 1000 + 60);
         userEntity = registerUserRedisRepository.save(userEntity);
