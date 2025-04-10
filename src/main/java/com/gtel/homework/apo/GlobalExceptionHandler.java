@@ -20,9 +20,6 @@ import java.util.UUID;
 public class GlobalExceptionHandler {
     protected final HttpServletRequest httpServletRequest;
 
-
-
-
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException(Exception ex) {
         log.error("ERROR: ", ex);

@@ -115,4 +115,6 @@ public class UserService  extends BaseService{
             throw new ApplicationException(ERROR_CODE.INVALID_REQUEST, "OTP is invalid");
         }
     }
+    
+
 }

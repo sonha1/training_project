@@ -8,7 +8,6 @@ import org.springframework.data.redis.core.TimeToLive;
 @Data
 @RedisHash("register_user")
 public class RegisterUserEntity {
-
     @Id
     private String transactionId;
 

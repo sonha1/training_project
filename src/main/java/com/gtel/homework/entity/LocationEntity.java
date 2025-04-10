@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "location")
-public class LocationEntity extends BaseEntity{
+public class LocationEntity extends BaseEntity {
     @Id
     @Column(name = "code")
     private String code;
@@ -19,5 +19,4 @@ public class LocationEntity extends BaseEntity{
 
     @Column(name = "description")
     private String description;
-
 }
