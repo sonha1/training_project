@@ -7,9 +7,9 @@ spring:
     name: srping-tutorial
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://103.70.12.113:5432/airport
+    url: jdbc:postgresql://localhost:5432/airport
     username: postgres
-    password: 123@123aA
+    password: sonha12
     hikari:
       connection-timeout: 60000
       maximum-pool-size: 25
@@ -19,7 +19,7 @@ spring:
       schema: public
   jpa:
     generate-ddl: false
-    hibernate.ddl-auto: none
+    hibernate.ddl-auto: update
     open-in-view: false
     show-sql: true
     properties:

@@ -23,6 +23,7 @@ public class PhoneNumberUtils {
         if (!phoneNumber.startsWith("0") && !phoneNumber.startsWith("+84") && !phoneNumber.startsWith("84")) {
             throw new ApplicationException(ERROR_CODE.INVALID_PARAMETER , "phoneNumber is invalid");
         }
+
         if (phoneNumber.startsWith("84")) {
             return  phoneNumber;
         }

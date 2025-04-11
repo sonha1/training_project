@@ -12,6 +12,7 @@ public class OtpLimitEntity {
     private String phoneNumber;
 
     private int dailyOtpCounter = 0;
+
     @TimeToLive
     private long ttl;
 }

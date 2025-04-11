@@ -11,7 +11,6 @@ import lombok.Data;
 @Entity
 @Table(name = "airport")
 public class AirportEntity extends BaseEntity{
-
     @Id
     private String iata;
 
@@ -30,7 +29,6 @@ public class AirportEntity extends BaseEntity{
     public AirportEntity(){
 
     }
-
 
     public AirportEntity(AirportRequest request){
         this.airportgroupcode = request.getAirportGroupCode();

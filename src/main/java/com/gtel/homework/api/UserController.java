@@ -11,10 +11,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/v1/user")
 public class UserController {
-
     @Autowired
     UserService userService;
-    // 1. register
+
     @PostMapping("/register")
     public RegisterResponse register(@RequestBody RegisterRequest registerRequest) throws ApplicationException {
         return userService.registerUser(registerRequest);
@@ -25,10 +24,8 @@ public class UserController {
         return userService.resendOtp(transactionId);
     }
 
-    // 3. verify otp
     @PostMapping("/confirm-otp")
-    public void confirmRegisterOtp(@RequestBody ConfirmOtpRegisterRequest request){
+    public void confirmRegisterOtp(@RequestBody ConfirmOtpRegisterRequest request) {
         this.userService.confirmRegisterOtp(request);
     }
-
 }

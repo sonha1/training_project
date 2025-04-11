@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 @Data
 @RedisHash("airport")
 public class AirportRedisEntity implements Serializable {
-
     @Id
     private String code;
 

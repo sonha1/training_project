@@ -8,8 +8,7 @@ import lombok.Data;
 @Data
 @Table(name = "users")
 @Entity
-public class UserEntity extends BaseEntity{
-
+public class UserEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -17,12 +16,10 @@ public class UserEntity extends BaseEntity{
     @Column(name = "phone_number")
     private String phoneNumber;
 
-
     @Column(name = "password")
     private String password;
 
     @Column(name = "status")
     @Convert(converter = UserStatusConverter.class)
     private USER_STATUS status;
-
 }
