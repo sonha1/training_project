@@ -23,11 +23,14 @@ import java.util.UUID;
 public class OtpDomain {
     private static final SecureRandom random = new SecureRandom();
     private static final DecimalFormat formatter = new DecimalFormat("000000");
-    @Autowired
-    private OtpLimitRedisRepository otpLimitRedisRepository;
 
-    @Autowired
-    private RegisterUserRedisRepository registerUserRedisRepository;
+    private final OtpLimitRedisRepository otpLimitRedisRepository;
+    private final RegisterUserRedisRepository registerUserRedisRepository;
+
+    public OtpDomain(RegisterUserRedisRepository registerUserRedisRepository, OtpLimitRedisRepository otpLimitRedisRepository) {
+        this.otpLimitRedisRepository = otpLimitRedisRepository;
+        this.registerUserRedisRepository = registerUserRedisRepository;
+    }
 
     public OtpLimitEntity validateLimitOtpByPhoneNumber(String phoneNumber) {
         log.info("[validateLimitOtpByPhoneNumber] START with phone {}", phoneNumber);

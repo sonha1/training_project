@@ -67,10 +67,10 @@ public class UserService extends BaseService {
 
     protected void validateUserRegisterRequest(RegisterRequest request) throws ApplicationException {
         if (StringUtils.isNullOrEmpty(request.getPhoneNumber())) {
-            throw new ApplicationException(ERROR_CODE.INVALID_PARAMETER, "phoneNumber is invalid");
+            throw new ApplicationException(ERROR_CODE.INVALID_PARAMETER, "Phone number is invalid");
         }
         if (StringUtils.isNullOrEmpty(request.getPassword())) {
-            throw new ApplicationException(ERROR_CODE.INVALID_PARAMETER, "password is invalid");
+            throw new ApplicationException(ERROR_CODE.INVALID_PARAMETER, "Password is invalid");
         }
         StringUtils.validatePassword(request.getPassword());
     }
@@ -98,6 +98,4 @@ public class UserService extends BaseService {
         return userRepository.findById(id).orElseThrow(() ->
                 new ApplicationException(ERROR_CODE.USER_NOT_FOUND, "User not found"));
     }
-
-
 }
