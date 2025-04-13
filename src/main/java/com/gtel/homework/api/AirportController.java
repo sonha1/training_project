@@ -4,6 +4,7 @@ import com.gtel.homework.exception.ApplicationException;
 import com.gtel.homework.model.request.AirportRequest;
 import com.gtel.homework.model.response.AirportResponse;
 import com.gtel.homework.service.AirportService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,7 @@ public class AirportController {
     }
 
     @RequestMapping(method = RequestMethod.HEAD)
-    public ResponseEntity countAirports() {
+    public ResponseEntity<?> countAirports() {
         int count = airportService.countAirports();
         return ResponseEntity.ok().header("X-Total-Count", String.valueOf(count)).build();
     }

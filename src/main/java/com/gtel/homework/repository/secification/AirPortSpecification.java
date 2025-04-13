@@ -1,7 +1,7 @@
 package com.gtel.homework.repository.secification;
 
 import com.gtel.homework.entity.AirportEntity;
-import com.gtel.homework.entity.UserEntity;
+import com.gtel.homework.entity.User;
 import com.gtel.homework.utils.StringUtils;
 import com.gtel.homework.utils.TextUtils;
 
@@ -17,7 +17,7 @@ import java.util.Objects;
 
 public class AirPortSpecification {
     private final String FIELD_NAME = "name";
-    private final List<Specification<UserEntity>> specifications = new ArrayList<>();
+    private final List<Specification<User>> specifications = new ArrayList<>();
 
     public static AirPortSpecification builder() {
         return new AirPortSpecification();
@@ -43,7 +43,7 @@ public class AirPortSpecification {
         );
     }
 
-    public Specification<UserEntity> build() {
+    public Specification<User> build() {
         return (root, query, builder) -> builder.and(
                 specifications.stream()
                         .filter(Objects::nonNull)

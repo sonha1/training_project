@@ -6,11 +6,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 
 @Data
 @Entity
 @Table(name = "airport")
-public class AirportEntity extends BaseEntity{
+public class AirportEntity {
     @Id
     private String iata;
 
@@ -26,9 +30,13 @@ public class AirportEntity extends BaseEntity{
     @Column(name = "priority")
     private Integer priority;
 
-    public AirportEntity(){
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
-    }
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     public AirportEntity(AirportRequest request){
         this.airportgroupcode = request.getAirportGroupCode();
@@ -36,5 +44,9 @@ public class AirportEntity extends BaseEntity{
         this.iata = request.getIata();
         this.language = request.getLanguage();
         this.priority = request.getPriority();
+    }
+
+    public AirportEntity() {
+
     }
 }

@@ -1,7 +1,8 @@
 package com.gtel.homework.service;
 
+import com.gtel.homework.common.Const;
 import com.gtel.homework.domains.OtpDomain;
-import com.gtel.homework.entity.UserEntity;
+import com.gtel.homework.entity.User;
 import com.gtel.homework.exception.ApplicationException;
 import com.gtel.homework.model.request.ConfirmOtpRegisterRequest;
 import com.gtel.homework.model.request.RegisterRequest;
@@ -28,51 +29,25 @@ public class UserService extends BaseService {
         this.userRepository = userRepository;
     }
 
-    public RegisterResponse registerUser(RegisterRequest request) throws ApplicationException {
-        this.validateUserRegisterRequest(request);
-        String phoneNumber = PhoneNumberUtils.validatePhoneNumber(request.getPhoneNumber());
-        log.info("[registerUser] - user register with phone {} START", phoneNumber);
-        UserEntity userEntity = userRepository.findByPhoneNumber(phoneNumber);
-        if (userEntity != null) {
-            log.info("[registerUser] request fail : user already exists with phone {}", phoneNumber);
-            throw new ApplicationException(ERROR_CODE.INVALID_REQUEST, "PhoneNumber is already exists");
-        }
-
-        RegisterUserEntity otpEntity = otpDomain.genOtpWhenUserRegister(phoneNumber, request.getPassword());
-        log.info("[registerUser] - user register with phone {} DONE", request.getPhoneNumber());
-        return new RegisterResponse(otpEntity);
-    }
-
     public RegisterResponse resendOtp(String transactionId) throws ApplicationException {
         RegisterUserEntity registerUser = this.validateTransactionId(transactionId);
-        log.info("[resendOtp] - Resend OTP with phone {} START", registerUser.getPhoneNumber());
+        String phoneNumber = registerUser.getData().getPhoneNumber();
+        log.info("[resendOtp] - Resend OTP with phone {} START", phoneNumber);
         otpDomain.genOtpWhenUserResend(registerUser);
-        log.info("[resendOtp] - Resend OTP with phone {} DONE", registerUser.getPhoneNumber());
+        log.info("[resendOtp] - Resend OTP with phone {} DONE", phoneNumber);
         return new RegisterResponse(registerUser);
     }
 
     public void confirmRegisterOtp(ConfirmOtpRegisterRequest request) {
         this.validateConfirmRequest(request);
         RegisterUserEntity registerUser = this.validateTransactionId(request.getTransactionId());
-        log.info("[confirmRegisterOtp] - Confirm OTP with phone {} START", registerUser.getPhoneNumber());
+        String phoneNumber = registerUser.getData().getPhoneNumber();
+        log.info("[confirmRegisterOtp] - Confirm OTP with phone {} START", phoneNumber);
         this.otpDomain.confirmOTP(registerUser, request.getOtp());
-        UserEntity user = new UserEntity();
-        user.setPhoneNumber(registerUser.getPhoneNumber());
-        user.setPassword(registerUser.getPassword());
-        user.setStatus(USER_STATUS.ACTIVE);
+        User user = new User(registerUser.getData());
         this.userRepository.save(user);
         this.otpDomain.removeCacheRegister(registerUser);
-        log.info("[confirmRegisterOtp] - Confirm OTP with phone {} END", registerUser.getPhoneNumber());
-    }
-
-    protected void validateUserRegisterRequest(RegisterRequest request) throws ApplicationException {
-        if (StringUtils.isNullOrEmpty(request.getPhoneNumber())) {
-            throw new ApplicationException(ERROR_CODE.INVALID_PARAMETER, "Phone number is invalid");
-        }
-        if (StringUtils.isNullOrEmpty(request.getPassword())) {
-            throw new ApplicationException(ERROR_CODE.INVALID_PARAMETER, "Password is invalid");
-        }
-        StringUtils.validatePassword(request.getPassword());
+        log.info("[confirmRegisterOtp] - Confirm OTP with phone {} END", phoneNumber);
     }
 
     protected RegisterUserEntity validateTransactionId(String transactionId) {
@@ -92,10 +67,5 @@ public class UserService extends BaseService {
         if (StringUtils.isNullOrEmpty(request.getOtp())) {
             throw new ApplicationException(ERROR_CODE.INVALID_REQUEST, "OTP is invalid");
         }
-    }
-
-    public UserEntity findById(Long id) {
-        return userRepository.findById(id).orElseThrow(() ->
-                new ApplicationException(ERROR_CODE.USER_NOT_FOUND, "User not found"));
     }
 }
