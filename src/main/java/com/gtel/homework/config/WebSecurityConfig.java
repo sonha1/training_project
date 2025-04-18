@@ -16,10 +16,11 @@ import org.springframework.security.web.SecurityFilterChain;
 public class WebSecurityConfig {
     private final String[] WHITE_LIST = {
             "/v1/register",
-            "/v1/otp/*",
+            "/v1/user/otp/**",
             "/swagger-ui.html",
             "/swagger-ui/**",
             "/v3/api-docs/**"
+
     };
 
     @Bean

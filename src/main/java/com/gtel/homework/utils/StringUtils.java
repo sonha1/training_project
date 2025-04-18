@@ -6,7 +6,7 @@ import com.gtel.homework.exception.ApplicationException;
 public class StringUtils {
 
     public static void validatePassword(String password) throws ApplicationException {
-        if (password.matches(Const.ValidateRegex.PASSWORD)) {
+        if (!password.matches(Const.ValidateRegex.PASSWORD)) {
             throw new ApplicationException(ERROR_CODE.INVALID_PARAMETER, "password is invalid");
         }
     }

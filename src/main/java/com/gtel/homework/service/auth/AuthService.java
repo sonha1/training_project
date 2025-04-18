@@ -8,6 +8,7 @@ import com.gtel.homework.model.response.RegisterResponse;
 import com.gtel.homework.redis.entities.RegisterUserEntity;
 import com.gtel.homework.repository.UserRepository;
 import com.gtel.homework.utils.ERROR_CODE;
+import com.gtel.homework.utils.PhoneNumberUtils;
 import com.gtel.homework.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,13 +55,14 @@ public class AuthService {
         if (StringUtils.isNullOrEmpty(request.getPassword())) {
             throw new ApplicationException(ERROR_CODE.INVALID_PARAMETER, "Password is invalid");
         }
-        if (StringUtils.isNullOrEmpty(request.getUsername())) {
-            throw new ApplicationException(ERROR_CODE.INVALID_PARAMETER, "Username is invalid");
-        }
-        if(StringUtils.isNullOrEmpty(request.getEmail())) {
-            throw new ApplicationException(ERROR_CODE.INVALID_PARAMETER, "Email is invalid");
-        }
+//        if (StringUtils.isNullOrEmpty(request.getUsername())) {
+//            throw new ApplicationException(ERROR_CODE.INVALID_PARAMETER, "Username is invalid");
+//        }
+//        if(StringUtils.isNullOrEmpty(request.getEmail())) {
+//            throw new ApplicationException(ERROR_CODE.INVALID_PARAMETER, "Email is invalid");
+//        }
 
+        request.setPhoneNumber(PhoneNumberUtils.validatePhoneNumber(request.getPhoneNumber()));
         StringUtils.validatePassword(request.getPassword());
     }
 }
