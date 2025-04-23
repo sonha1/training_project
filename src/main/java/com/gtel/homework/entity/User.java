@@ -1,17 +1,20 @@
 package com.gtel.homework.entity;
 
 import com.gtel.homework.entity.converters.UserStatusConverter;
+import com.gtel.homework.enums.UserRole;
 import com.gtel.homework.model.request.RegisterRequest;
 import com.gtel.homework.utils.BcryptUtils;
 import com.gtel.homework.utils.USER_STATUS;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
 @Table(name = "users")
 @Entity
+@NoArgsConstructor
 public class User extends BaseEntity {
     @Column(name = "username")
     private String username;
@@ -42,6 +45,10 @@ public class User extends BaseEntity {
 
     @Column(name = "avatar_url")
     private String avatarUrl;
+
+    @Column(name = "role")
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
 
     public User(RegisterRequest request) {
         this.username = request.getUsername();

@@ -40,3 +40,9 @@ server:
 logging:
   level:
     com.gtel: debug
+
+jwt:
+  prefix: Bearer
+  secret: Gtel_Training@2025
+  refreshSecret: rfGtel_Training@2025
+  validity: 86400

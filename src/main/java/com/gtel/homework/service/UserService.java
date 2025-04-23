@@ -2,18 +2,24 @@ package com.gtel.homework.service;
 
 import com.gtel.homework.common.Const;
 import com.gtel.homework.domains.OtpDomain;
+import com.gtel.homework.dto.auth.UserPrincipal;
 import com.gtel.homework.entity.User;
 import com.gtel.homework.exception.ApplicationException;
 import com.gtel.homework.model.request.ConfirmOtpRegisterRequest;
+import com.gtel.homework.model.request.LoginRequest;
+import com.gtel.homework.model.request.LoginResponse;
 import com.gtel.homework.model.request.RegisterRequest;
 import com.gtel.homework.model.response.RegisterResponse;
 import com.gtel.homework.redis.entities.RegisterUserEntity;
 import com.gtel.homework.repository.UserRepository;
-import com.gtel.homework.utils.ERROR_CODE;
-import com.gtel.homework.utils.PhoneNumberUtils;
-import com.gtel.homework.utils.StringUtils;
-import com.gtel.homework.utils.USER_STATUS;
+import com.gtel.homework.utils.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -23,6 +29,13 @@ import java.util.Optional;
 public class UserService extends BaseService {
     private final OtpDomain otpDomain;
     private final UserRepository userRepository;
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Value("${jwt.prefix:Bearer}")
+    private String prefixToken;
 
     public UserService(OtpDomain otpDomain, UserRepository userRepository) {
         this.otpDomain = otpDomain;
@@ -67,5 +80,20 @@ public class UserService extends BaseService {
         if (StringUtils.isNullOrEmpty(request.getOtp())) {
             throw new ApplicationException(ERROR_CODE.INVALID_REQUEST, "OTP is invalid");
         }
+    }
+
+    public LoginResponse login(LoginRequest loginRequest) throws ApplicationException {
+        Authentication authentication;
+        try {
+            authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+        } catch (Exception e) {
+            throw new ApplicationException(ERROR_CODE.USER_OR_PASS_INCORRECT);
+        }
+
+        final String token = jwtTokenUtil.generateToken((UserPrincipal) authentication.getPrincipal());
+
+        final String rfToken = jwtTokenUtil.generateRfToken((UserPrincipal) authentication.getPrincipal());
+
+        return new LoginResponse(token, rfToken, (UserPrincipal) authentication.getPrincipal(), prefixToken);
     }
 }

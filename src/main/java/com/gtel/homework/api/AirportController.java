@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ public class AirportController {
     private AirportService airportService;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public List<AirportResponse> getAirports(@RequestParam(required = false) Map<String, String> params) {
         return airportService.getAirportsNo4(params);
     }
