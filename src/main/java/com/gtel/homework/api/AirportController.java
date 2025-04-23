@@ -4,15 +4,20 @@ import com.gtel.homework.exception.ApplicationException;
 import com.gtel.homework.model.request.AirportRequest;
 import com.gtel.homework.model.response.AirportResponse;
 import com.gtel.homework.service.AirportService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/v1/airports")
+@SecurityRequirement(name = "bearerAuth")
 public class AirportController {
     @Autowired
     private AirportService airportService;
@@ -23,7 +28,7 @@ public class AirportController {
     }
 
     @RequestMapping(method = RequestMethod.HEAD)
-    public ResponseEntity countAirports() {
+    public ResponseEntity<?> countAirports() {
         int count = airportService.countAirports();
         return ResponseEntity.ok().header("X-Total-Count", String.valueOf(count)).build();
     }

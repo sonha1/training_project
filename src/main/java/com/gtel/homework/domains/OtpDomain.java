@@ -1,6 +1,7 @@
 package com.gtel.homework.domains;
 
 import com.gtel.homework.exception.ApplicationException;
+import com.gtel.homework.model.request.RegisterRequest;
 import com.gtel.homework.redis.entities.OtpLimitEntity;
 import com.gtel.homework.redis.entities.RegisterUserEntity;
 import com.gtel.homework.redis.repository.OtpLimitRedisRepository;
@@ -55,34 +56,32 @@ public class OtpDomain {
     }
 
 
-    public RegisterUserEntity genOtpWhenUserRegister(String phoneNumber, String password) {
-        log.info("[genOtpWhenUserRegister] START with phone {}", phoneNumber);
-        OtpLimitEntity otpLimit = this.validateLimitOtpByPhoneNumber(phoneNumber);
+    public RegisterUserEntity genOtpWhenUserRegister(RegisterRequest request) {
+        log.info("[genOtpWhenUserRegister] START with phone {}", request.getPhoneNumber());
+        OtpLimitEntity otpLimit = this.validateLimitOtpByPhoneNumber(request.getPhoneNumber());
         String otp = genOtp();
-        RegisterUserEntity registerUserEntity = new RegisterUserEntity();
-
         String transactionId = UUID.randomUUID().toString();
+        RegisterUserEntity registerUserEntity = new RegisterUserEntity();
         registerUserEntity.setTransactionId(transactionId);
-        log.info("[genOtpWhenUserRegister] transactionId {} with phoneNumber {}", transactionId, phoneNumber);
+        log.info("[genOtpWhenUserRegister] transactionId {} with phoneNumber {}", transactionId, request.getPhoneNumber());
         registerUserEntity.setOtp(otp);
-        registerUserEntity.setPhoneNumber(phoneNumber);
-        registerUserEntity.setPassword(BcryptUtils.encode(password));
+        registerUserEntity.setData(request);
+        // TODO : move to config env
         registerUserEntity.setOtpFail(0);
         registerUserEntity.setOtpExpiredTime(System.currentTimeMillis() / 1000 + 300);
         registerUserEntity.setOtpResendTime(System.currentTimeMillis() / 1000 + 60);
         registerUserEntity.setTtl(900);
         registerUserRedisRepository.save(registerUserEntity);
-
         otpLimit.setDailyOtpCounter(otpLimit.getDailyOtpCounter() + 1);
         otpLimitRedisRepository.save(otpLimit);
-
-        log.info("[genOtpWhenUserRegister] DONE with phone {}", phoneNumber);
+        log.info("[genOtpWhenUserRegister] DONE with phone {}", request.getPhoneNumber());
         return registerUserEntity;
     }
 
     public void genOtpWhenUserResend(RegisterUserEntity userEntity) {
-        log.info("[genOtpWhenUserResend] START with phone {}", userEntity.getPhoneNumber());
-        OtpLimitEntity otpLimit = this.validateLimitOtpByPhoneNumber(userEntity.getPhoneNumber());
+        String phoneNumber = userEntity.getData().getPhoneNumber();
+        log.info("[genOtpWhenUserResend] START with phone {}", phoneNumber);
+        OtpLimitEntity otpLimit = this.validateLimitOtpByPhoneNumber(phoneNumber);
         if (System.currentTimeMillis() / 1000 - userEntity.getOtpResendTime() < 0) {
             throw new ApplicationException(ERROR_CODE.INVALID_REQUEST, "OTP resend time not allow to send OTP!");
         }
@@ -99,11 +98,12 @@ public class OtpDomain {
         otpLimit.setDailyOtpCounter(otpLimit.getDailyOtpCounter() + 1);
         otpLimitRedisRepository.save(otpLimit);
 
-        log.info("[genOtpWhenUserResend] DONE with phone {}", userEntity.getPhoneNumber());
+        log.info("[genOtpWhenUserResend] DONE with phone {}", phoneNumber);
     }
 
     public void confirmOTP(RegisterUserEntity registerUser, String otp) {
-        log.info("[confirmOTP] START with phone {}", registerUser.getPhoneNumber());
+        String phoneNumber = registerUser.getData().getPhoneNumber();
+        log.info("[confirmOTP] START with phone {}", phoneNumber);
         if (registerUser.getOtpExpiredTime() < System.currentTimeMillis() / 1000) {
             throw new ApplicationException(ERROR_CODE.INVALID_REQUEST, "OTP is expired time");
         }
@@ -116,14 +116,15 @@ public class OtpDomain {
             this.registerUserRedisRepository.save(registerUser);
             throw new ApplicationException(ERROR_CODE.INVALID_REQUEST, "OTP incorrect");
         }
-        log.info("[confirmOTP] START with phone {}", registerUser.getPhoneNumber());
+        log.info("[confirmOTP] START with phone {}", phoneNumber);
     }
 
     public void removeCacheRegister(RegisterUserEntity registerUser) {
-        log.info("[removeCacheRegister] START with phone {}", registerUser.getPhoneNumber());
+        String phoneNumber = registerUser.getData().getPhoneNumber();
+        log.info("[removeCacheRegister] START with phone {}", phoneNumber);
         this.registerUserRedisRepository.delete(registerUser);
-        this.otpLimitRedisRepository.deleteById(registerUser.getPhoneNumber());
-        log.info("[removeCacheRegister] START with phone {}", registerUser.getPhoneNumber());
+        this.otpLimitRedisRepository.deleteById(phoneNumber);
+        log.info("[removeCacheRegister] START with phone {}", phoneNumber);
     }
 
     protected String genOtp() {

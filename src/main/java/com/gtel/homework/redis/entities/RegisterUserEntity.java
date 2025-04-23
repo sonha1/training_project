@@ -1,29 +1,30 @@
 package com.gtel.homework.redis.entities;
 
+import com.gtel.homework.model.request.RegisterRequest;
 import lombok.Data;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.TimeToLive;
 
 @Data
 @RedisHash("register_user")
+@Setter
 public class RegisterUserEntity {
     @Id
     private String transactionId;
 
     private String otp;
 
-    private long otpExpiredTime;
+    private Long otpExpiredTime;
 
-    private long otpResendTime;
+    private Long otpResendTime;
 
-    private int otpResendCount;
+    private Integer otpResendCount;
 
-    private String phoneNumber;
+    private RegisterRequest data;
 
-    private String password;
-
-    private int otpFail;
+    private Integer otpFail;
 
     @TimeToLive
     private long ttl;
