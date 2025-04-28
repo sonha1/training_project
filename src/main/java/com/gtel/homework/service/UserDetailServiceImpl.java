@@ -28,12 +28,11 @@ public class UserDetailServiceImpl implements UserDetailsService {
         UserPrincipal userPrincipal = new UserPrincipal();
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            Set<GrantedAuthority> authorities = Set.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name().toUpperCase()));
 
             userPrincipal.setUserId(user.getId());
             userPrincipal.setUsername(user.getUsername());
             userPrincipal.setPassword(user.getPassword());
-            userPrincipal.setAuthorities(authorities);
+            userPrincipal.setAuthorities(new HashSet<>());
         }
 
         return userPrincipal;

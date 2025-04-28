@@ -20,7 +20,8 @@ public enum ERROR_CODE {
     RESOURCE_NOT_FOUND("ER_404", "Resource Not Found"),
     INTERNAL_SERVER_ERROR("ER_500", "Internal Server Error"),
     USER_NOT_FOUND("ER404", "User not found"),
-    USER_OR_PASS_INCORRECT("ER400", "User or password not match");
+    USER_OR_PASS_INCORRECT("ER400", "User or password not match"),
+    ACCOUNT_DISABLED("ER400","Account is disabled");
 
     private final String errorCode;
     private final String message;
